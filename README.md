@@ -12,3 +12,5 @@ npx esbuild components/Sections.jsx components/RegisterWidget.jsx components/App
 ```
 
 The pop-up embeds Tally form `PRd1ZV` (fields only, c09 logic). Set `tallyFormId` to `null` in `content.js` to show the local stand-in form instead.
+
+Live: https://masterclass-landing-self.vercel.app (Vercel project `masterclass-landing`, team 100x RevOps). Every push to `main` redeploys it.
