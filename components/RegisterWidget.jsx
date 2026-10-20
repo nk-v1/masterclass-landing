@@ -140,7 +140,7 @@ function RegisterWidget({ formId, fallbackNote, button, buttonDone, panelTitle, 
         <button className="btn" onClick={() => { setFrom("register_button"); setOpen(true); }}>{done ? buttonDone : button}</button>
       </div>
       <div className={"reg-backdrop" + (open ? " open" : "")} onClick={() => setOpen(false)} />
-      <div ref={panelRef} className={"reg-panel" + (formId ? " dark" : "") + (open ? " open" : "")} role="dialog" aria-label={panelTitle} aria-hidden={!open}>
+      <div ref={panelRef} className={"reg-panel" + (open ? " open" : "")} role="dialog" aria-label={panelTitle} aria-hidden={!open}>
         <div className="reg-handle" />
         <div className="reg-head">
           <h3>{panelTitle}</h3>
