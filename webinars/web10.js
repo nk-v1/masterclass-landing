@@ -2,9 +2,8 @@
 window.WEBINARS = window.WEBINARS || {};
 window.WEBINARS.web10 = {
   pageTitle: "Agents for Senior Professionals | 100xEngineers",
-  // c09_web10 as it is today: a full Tally page, so its own copy shows inside the pop-up.
-  // A fields-only twin (like PRd1ZV for Tokenmaxxing) would remove that.
-  tallyFormId: "jadrBQ",
+  // Fields-only twin of c09_web10 (jadrBQ), same questions and c09 logic.
+  tallyFormId: "7XRKVP",
 
   hero: {
     tag: "Free live masterclass",
