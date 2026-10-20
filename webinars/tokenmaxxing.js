@@ -1,21 +1,32 @@
-// All copy and settings for one masterclass. A new masterclass = edit this file only.
-// In Framer these become the property controls on each component.
-window.MASTERCLASS = {
-  slug: "tokenmaxxing",
+// One webinar = one file like this. Copy _template.js, fill it in, and register it in site.js.
+window.WEBINARS = window.WEBINARS || {};
+window.WEBINARS.tokenmaxxing = {
+  pageTitle: "Tokenmaxxing on Claude | 100xEngineers",
   tallyFormId: "PRd1ZV", // fields-only c09 form; null shows the stand-in form instead
-  tallyFallbackNote: "Tally form ID not set yet. This is a stand-in so you can see the pop-up.",
 
   hero: {
     tag: "Free live masterclass",
     title: "Tokenmaxxing on Claude",
+    highlightLastWords: 2, // how many words at the end of the title are coral
     hook: "85% of what a Claude session costs goes to re-reading your chat, not answering you. Learn the 7 habits draining your limit and the fixes that make it last all week.",
     chips: ["Sun 25 Oct", "3:00 PM IST", "90 mins", "Live on Zoom", "Free"],
     cta: "Save your spot",
-    bar: { readPct: 85, readLabel: "Re-reading your chat", writePct: 15, writeLabel: "Answering you" },
+    // Card on the right of the hero: "stat" (big number + bar) or "list" (title + items)
+    visual: {
+      type: "stat",
+      label: "Where a Claude session's cost goes",
+      value: 85,
+      caption: "goes to re-reading your chat.",
+      bar: [
+        { pct: 85, label: "Re-reading your chat" },
+        { pct: 15, label: "Answering you" },
+      ],
+    },
   },
 
   learn: {
     label: "What you'll learn",
+    heading: "3 things you'll leave with",
     items: [
       { n: "01", title: "See where your tokens actually go", body: "How Claude reads a chat, and why re-reading context, not the length of its answers, uses up most of your limit." },
       { n: "02", title: "Spot the 7 hidden leaks", body: "Raw PDFs, full-size screenshots, noisy tool output, connectors you never use: the everyday habits that drain your usage without you noticing." },
@@ -25,28 +36,20 @@ window.MASTERCLASS = {
 
   why: {
     label: "Why this matters",
+    punch: "The real cost sits in",
+    punchHighlight: "what it reads.",
     lines: [
       "Most tips for stretching your Claude limit focus on making Claude answer shorter. That barely moves the needle, because what Claude writes is a small slice of what you pay for.",
-      "The real cost sits in what it reads.",
       "Fix that, and the same plan goes a lot further, whether you're on Pro, Max or paying per token through the API.",
     ],
-    plans: ["Pro", "Max", "API"],
+    tags: ["Pro", "Max", "API"],
   },
 
-  instructor: {
-    label: "Meet your instructor",
-    name: "Siddhant Goswami",
-    role: "Co-founder and CTO, 100xEngineers",
-    photo: null, // instructor photo URL
-    points: [
-      "10+ years building AI products and training 50,000+ professionals in applied AI",
-      "Partnered with OpenAI and Meta to build official courses for OpenAI Academy and Meta Blueprint",
-      "Exited two companies to Unacademy, scaling products to $10M+ valuation and 1M+ users",
-    ],
-  },
+  instructor: "siddhant", // key in site.js instructors
 
   faq: {
     label: "Questions",
+    heading: "Before you sign up",
     items: [
       { q: "Is it really free?", a: "Yes. Register and you'll get the Zoom link by email." },
       { q: "When and where?", a: "Sunday 25 October 2026, 3:00 PM IST, live on Zoom. It runs for 90 minutes." },
@@ -56,10 +59,9 @@ window.MASTERCLASS = {
     ],
   },
 
+  closing: { title: "See you Sunday" },
+
   register: {
-    button: "Register now",
-    buttonDone: "You're registered",
-    panelTitle: "Save your spot",
     panelSub: "Free · Sun 25 Oct · 3:00 PM IST · Zoom",
     mobileBarLine: "Free · Sun 25 Oct, 3 PM IST",
   },

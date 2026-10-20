@@ -107,7 +107,11 @@ function StandInForm({ onSubmit, note }) {
   );
 }
 
-function RegisterWidget({ formId, fallbackNote, button, buttonDone, panelTitle, panelSub, mobileBarLine }) {
+function RegisterWidget({
+  formId, panelSub, mobileBarLine,
+  button = "Register now", buttonDone = "You're registered", panelTitle = "Save your spot",
+  fallbackNote = "Tally form ID not set yet. This is a stand-in so you can see the pop-up.",
+}) {
   const [open, setOpen] = React.useState(false);
   const [done, setDone] = React.useState(false);
   // Fallback for landing_page when the URL has none (someone opened /masterclass directly).
@@ -129,6 +133,18 @@ function RegisterWidget({ formId, fallbackNote, button, buttonDone, panelTitle, 
     const mobile = window.matchMedia("(max-width: 767px)").matches;
     document.body.classList.toggle("sheet-open", open && mobile);
     if (panelRef.current) panelRef.current.inert = !open;
+  }, [open]);
+
+  // Clicking anywhere outside the pop-up closes it. The form stays mounted, so whatever
+  // they typed is still there when they reopen it. (Mobile uses the backdrop instead.)
+  React.useEffect(() => {
+    if (!open) return;
+    const onDown = (e) => {
+      if (panelRef.current.contains(e.target) || e.target.closest(".reg-launch, [data-open]")) return;
+      setOpen(false);
+    };
+    document.addEventListener("mousedown", onDown);
+    return () => document.removeEventListener("mousedown", onDown);
   }, [open]);
 
   const handleDone = () => { setDone(true); trackLead(); };
