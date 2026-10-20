@@ -1,47 +1,76 @@
-// Page sections. Each one takes its slice of content.js as props, so in Framer
-// each becomes its own code component with matching property controls.
+// Page sections. Each one takes its slice of the webinar file (or site.js) as props, so in
+// Framer each becomes its own code component with matching property controls.
 
 const openRegister = (from) =>
   window.dispatchEvent(new CustomEvent("hx:open-register", { detail: { from } }));
 
-function Hero({ tag, title, hook, chips, cta, bar }) {
+function Nav({ home, cta }) {
+  return (
+    <nav className="nav">
+      <div className="wrap nav-row">
+        <a className="logo" href={home} aria-label="100xEngineers home">100<span>x</span>Engineers</a>
+        <a className="btn btn-sm" href={cta.href}>{cta.label}</a>
+      </div>
+    </nav>
+  );
+}
+
+function HeroVisual({ visual }) {
+  if (!visual) return null;
+  if (visual.type === "stat") {
+    return (
+      <div className="card bar-card">
+        <p className="label">{visual.label}</p>
+        <div className="big">{visual.value}%</div>
+        <p>{visual.caption}</p>
+        <div className="bar">
+          {visual.bar.map((b, i) => (
+            <div key={b.label} className={i === 0 ? "read" : "write"} style={{ width: b.pct + "%" }}>{b.pct}%</div>
+          ))}
+        </div>
+        <div className="bar-legend">{visual.bar.map((b) => <span key={b.label}>{b.label}</span>)}</div>
+      </div>
+    );
+  }
+  return (
+    <div className="card bar-card">
+      <p className="label">{visual.label}</p>
+      <h3 className="list-title">{visual.title}</h3>
+      <ul className="hero-list">{visual.items.map((it) => <li key={it}>{it}</li>)}</ul>
+    </div>
+  );
+}
+
+function Hero({ tag, title, highlightLastWords = 2, hook, chips, cta, visual }) {
   const words = title.split(" ");
+  const cut = Math.max(0, words.length - highlightLastWords);
   return (
     <header className="hero">
       <div className="wrap hero-grid">
         <div>
           <p className="label live-tag"><span className="live-dot" />{tag}</p>
-          <h1>{words.slice(0, -2).join(" ")} <span>{words.slice(-2).join(" ")}</span></h1>
+          <h1>{words.slice(0, cut).join(" ")} <span>{words.slice(cut).join(" ")}</span></h1>
           <p className="hero-hook">{hook}</p>
           <div className="chips">
             {chips.map((c, i) => <span key={c} className={"chip" + (i === chips.length - 1 ? " hot" : "")}>{c}</span>)}
           </div>
           <div className="hero-cta">
-            <button className="btn" onClick={() => openRegister("hero")}>{cta} →</button>
+            <button className="btn" data-open onClick={() => openRegister("hero")}>{cta} →</button>
             <span className="hero-note">Zoom link sent by email</span>
           </div>
         </div>
-        <div className="card bar-card">
-          <p className="label">Where a Claude session's cost goes</p>
-          <div className="big">{bar.readPct}%</div>
-          <p>goes to {bar.readLabel.toLowerCase()}.</p>
-          <div className="bar">
-            <div className="read" style={{ width: bar.readPct + "%" }}>{bar.readPct}%</div>
-            <div className="write" style={{ width: bar.writePct + "%" }}>{bar.writePct}%</div>
-          </div>
-          <div className="bar-legend"><span>{bar.readLabel}</span><span>{bar.writeLabel}</span></div>
-        </div>
+        <HeroVisual visual={visual} />
       </div>
     </header>
   );
 }
 
-function Learn({ label, items }) {
+function Learn({ label, heading, items }) {
   return (
     <section className="section">
       <div className="wrap">
         <p className="label">{label}</p>
-        <h2>3 things you'll leave with</h2>
+        <h2>{heading}</h2>
         <div className="learn-grid">
           {items.map((it) => (
             <article key={it.n} className="card learn-card">
@@ -56,19 +85,17 @@ function Learn({ label, items }) {
   );
 }
 
-function Why({ label, lines, plans }) {
-  const [before, punch, after] = lines;
+function Why({ label, punch, punchHighlight, lines, tags = [] }) {
   return (
     <section className="section why">
       <div className="wrap why-grid">
         <div>
           <p className="label">{label}</p>
-          <p className="punch">The real cost sits in <span>what it reads.</span></p>
+          <p className="punch">{punch} <span>{punchHighlight}</span></p>
         </div>
         <div>
-          <p>{before}</p>
-          <p>{after}</p>
-          <div className="plans">{plans.map((p) => <span key={p} className="chip">{p}</span>)}</div>
+          {lines.map((l) => <p key={l}>{l}</p>)}
+          {tags.length > 0 && <div className="plans">{tags.map((p) => <span key={p} className="chip">{p}</span>)}</div>}
         </div>
       </div>
     </section>
@@ -94,12 +121,12 @@ function Instructor({ label, name, role, photo, points }) {
   );
 }
 
-function Faq({ label, items }) {
+function Faq({ label, heading, items }) {
   return (
     <section className="section">
       <div className="wrap">
         <p className="label">{label}</p>
-        <h2>Before you sign up</h2>
+        <h2>{heading}</h2>
         <div className="faq">
           {items.map((it) => (
             <details key={it.q} className="card">
@@ -119,10 +146,30 @@ function Closing({ title, cta, chips }) {
       <div className="wrap">
         <h2>{title}</h2>
         <p>{chips.join(" · ")}</p>
-        <button className="btn" onClick={() => openRegister("closing")}>{cta} →</button>
+        <button className="btn" data-open onClick={() => openRegister("closing")}>{cta} →</button>
       </div>
     </section>
   );
 }
 
-Object.assign(window, { Hero, Learn, Why, Instructor, Faq, Closing, openRegister });
+function Footer({ links, contacts, socials, copyright }) {
+  return (
+    <footer className="footer">
+      <div className="wrap footer-grid">
+        <div>
+          <a className="logo logo-light" href="https://www.100xengineers.com/">100<span>x</span>Engineers</a>
+          <div className="footer-socials">{socials.map((s) => <a key={s.label} href={s.href}>{s.label}</a>)}</div>
+        </div>
+        <ul className="footer-links">{links.map((l) => <li key={l.label}><a href={l.href}>{l.label}</a></li>)}</ul>
+        <div className="footer-contacts">
+          {contacts.map((c) => (
+            <p key={c.value}><span>{c.label}</span><a href={c.href}>{c.value}</a></p>
+          ))}
+        </div>
+      </div>
+      <div className="wrap footer-copy">{copyright}</div>
+    </footer>
+  );
+}
+
+Object.assign(window, { Nav, Hero, Learn, Why, Instructor, Faq, Closing, Footer, openRegister });

@@ -59,7 +59,15 @@ function StandInForm({ onSubmit, note }) {
     setErr("");
   } }, b)))), /* @__PURE__ */ React.createElement("p", { className: "err" }, err), /* @__PURE__ */ React.createElement("div", { className: "row-btns" }, /* @__PURE__ */ React.createElement("button", { className: "btn btn-ghost", style: { flex: "none" }, onClick: () => setStep(1) }, "Back"), /* @__PURE__ */ React.createElement("button", { className: "btn", onClick: submit }, "Reserve my spot"))));
 }
-function RegisterWidget({ formId, fallbackNote, button, buttonDone, panelTitle, panelSub, mobileBarLine }) {
+function RegisterWidget({
+  formId,
+  panelSub,
+  mobileBarLine,
+  button = "Register now",
+  buttonDone = "You're registered",
+  panelTitle = "Save your spot",
+  fallbackNote = "Tally form ID not set yet. This is a stand-in so you can see the pop-up."
+}) {
   const [open, setOpen] = React.useState(false);
   const [done, setDone] = React.useState(false);
   const [from, setFrom] = React.useState("masterclass_page");
@@ -81,6 +89,15 @@ function RegisterWidget({ formId, fallbackNote, button, buttonDone, panelTitle, 
     const mobile = window.matchMedia("(max-width: 767px)").matches;
     document.body.classList.toggle("sheet-open", open && mobile);
     if (panelRef.current) panelRef.current.inert = !open;
+  }, [open]);
+  React.useEffect(() => {
+    if (!open) return;
+    const onDown = (e) => {
+      if (panelRef.current.contains(e.target) || e.target.closest(".reg-launch, [data-open]")) return;
+      setOpen(false);
+    };
+    document.addEventListener("mousedown", onDown);
+    return () => document.removeEventListener("mousedown", onDown);
   }, [open]);
   const handleDone = () => {
     setDone(true);
