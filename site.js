@@ -9,7 +9,7 @@ window.SITE = {
       label: "Meet your instructor",
       name: "Siddhant Goswami",
       role: "Co-founder and CTO, 100xEngineers",
-      photo: null, // e.g. "assets/siddhant.jpg"
+      photo: "https://ltliczqfpnftqmooesyt.supabase.co/storage/v1/object/public/assets/siddhant_goswani_photo.png",
       points: [
         "10+ years building AI products and training 50,000+ professionals in applied AI",
         "Partnered with OpenAI and Meta to build official courses for OpenAI Academy and Meta Blueprint",
