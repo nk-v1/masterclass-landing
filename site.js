@@ -2,7 +2,7 @@
 // the navbar and the footer. Each webinar's own copy lives in webinars/<slug>.js.
 window.SITE = {
   active: "tokenmaxxing", // shown at "/"; any webinar is also reachable at /<slug>
-  webinars: ["tokenmaxxing"],
+  webinars: ["tokenmaxxing", "web10"],
 
   instructors: {
     siddhant: {
