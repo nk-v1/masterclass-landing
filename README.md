@@ -11,4 +11,4 @@ Static prototype of the 100xEngineers masterclass landing page, built as separat
 npx esbuild components/Sections.jsx components/RegisterWidget.jsx components/App.jsx --outdir=dist --jsx=transform --target=es2019
 ```
 
-Until `tallyFormId` is set in `content.js`, the pop-up shows a stand-in form that submits nowhere.
+The pop-up embeds Tally form `PRd1ZV` (fields only, c09 logic). Set `tallyFormId` to `null` in `content.js` to show the local stand-in form instead.

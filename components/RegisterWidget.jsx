@@ -9,29 +9,36 @@ function trackLead() {
   if (window.gtag) window.gtag("event", "generate_lead", { form: "masterclass" });
 }
 
+// Loads the form directly (not through Tally's embed.js, which skips hidden iframes)
+// so it's ready before anyone clicks. Height and submit come from the iframe's messages.
 function TallyEmbed({ formId, landingPage, onSubmit }) {
-  const ref = React.useRef(null);
-  const params = window.hxTrackingParams ? window.hxTrackingParams(landingPage) : new URLSearchParams();
-  ["alignLeft", "hideTitle", "transparentBackground", "dynamicHeight"].forEach((k) => params.set(k, "1"));
-  const src = `https://tally.so/embed/${formId}?${params.toString()}`;
+  const [src] = React.useState(() => {
+    const params = window.hxTrackingParams ? window.hxTrackingParams(landingPage) : new URLSearchParams();
+    ["alignLeft", "hideTitle", "transparentBackground", "dynamicHeight"].forEach((k) => params.set(k, "1"));
+    return `https://tally.so/embed/${formId}?${params.toString()}`;
+  });
+  const [height, setHeight] = React.useState(360);
 
   React.useEffect(() => {
-    const load = () => window.Tally && window.Tally.loadEmbeds();
-    if (window.Tally) load();
-    else {
-      const s = document.createElement("script");
-      s.src = "https://tally.so/widgets/embed.js";
-      s.onload = load;
-      document.body.appendChild(s);
-    }
     const onMsg = (e) => {
-      if (typeof e.data === "string" && e.data.includes("Tally.FormSubmitted")) onSubmit();
+      if (e.origin !== "https://tally.so" || typeof e.data !== "string") return;
+      // iframe-resizer format: "[iFrameSizer]<id>:<height>:<width>:<type>"
+      if (e.data.startsWith("[iFrameSizer]")) {
+        const h = parseFloat(e.data.split(":")[1]);
+        if (h > 0) setHeight(Math.ceil(h));
+      } else if (e.data.includes("Tally.FormSubmitted")) {
+        onSubmit();
+      }
     };
     window.addEventListener("message", onMsg);
     return () => window.removeEventListener("message", onMsg);
-  }, [src]);
+  }, []);
 
-  return <iframe ref={ref} data-tally-src={src} loading="eager" width="100%" height="320" frameBorder="0" title="Register" />;
+  // The form only reports its height after this iframe-resizer handshake (what embed.js would send).
+  const handshake = (e) =>
+    e.currentTarget.contentWindow.postMessage("[iFrameSizer]iFrameResizer0:8:false:false:32:true:true:null:bodyOffset:null:null:0:false:parent:scroll:true", "https://tally.so");
+
+  return <iframe src={src} onLoad={handshake} width="100%" height={height} frameBorder="0" scrolling="no" title="Register" style={{ transition: "height 0.2s" }} />;
 }
 
 // Stand-in with the same fields and c09 logic, shown only while tallyFormId is null.
@@ -103,7 +110,8 @@ function StandInForm({ onSubmit, note }) {
 function RegisterWidget({ formId, fallbackNote, button, buttonDone, panelTitle, panelSub, mobileBarLine }) {
   const [open, setOpen] = React.useState(false);
   const [done, setDone] = React.useState(false);
-  const [from, setFrom] = React.useState("register_button");
+  // Fallback for landing_page when the URL has none (someone opened /masterclass directly).
+  const [from, setFrom] = React.useState("masterclass_page");
 
   React.useEffect(() => {
     const onOpen = (e) => { setFrom((e.detail && e.detail.from) || "register_button"); setOpen(true); };
@@ -113,10 +121,14 @@ function RegisterWidget({ formId, fallbackNote, button, buttonDone, panelTitle, 
     return () => { window.removeEventListener("hx:open-register", onOpen); window.removeEventListener("keydown", onKey); };
   }, []);
 
+  const panelRef = React.useRef(null);
+
   // Lock page scroll only for the mobile sheet; on laptop the page keeps scrolling.
+  // The closed panel stays rendered (so Tally can preload) but inert, so it can't be tabbed into.
   React.useEffect(() => {
     const mobile = window.matchMedia("(max-width: 767px)").matches;
     document.body.classList.toggle("sheet-open", open && mobile);
+    if (panelRef.current) panelRef.current.inert = !open;
   }, [open]);
 
   const handleDone = () => { setDone(true); trackLead(); };
@@ -128,7 +140,7 @@ function RegisterWidget({ formId, fallbackNote, button, buttonDone, panelTitle, 
         <button className="btn" onClick={() => { setFrom("register_button"); setOpen(true); }}>{done ? buttonDone : button}</button>
       </div>
       <div className={"reg-backdrop" + (open ? " open" : "")} onClick={() => setOpen(false)} />
-      <div className={"reg-panel" + (open ? " open" : "")} role="dialog" aria-label={panelTitle} aria-hidden={!open}>
+      <div ref={panelRef} className={"reg-panel" + (formId ? " dark" : "") + (open ? " open" : "")} role="dialog" aria-label={panelTitle} aria-hidden={!open}>
         <div className="reg-handle" />
         <div className="reg-head">
           <h3>{panelTitle}</h3>

@@ -2,7 +2,7 @@
 // In Framer these become the property controls on each component.
 window.MASTERCLASS = {
   slug: "tokenmaxxing",
-  tallyFormId: null, // set to the new fields-only form ID when the Tally session reports it
+  tallyFormId: "PRd1ZV", // fields-only c09 form; null shows the stand-in form instead
   tallyFallbackNote: "Tally form ID not set yet. This is a stand-in so you can see the pop-up.",
 
   hero: {
